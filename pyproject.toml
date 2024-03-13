@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "analogrb"
+version = "0.1.0"
+description = ""
+authors = ["Jadwiga Wilkens <wilkensjadwiga@gmail.com>"]
+readme = "README.md"
+packages = [{include = "analogrb", from = "src"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.12"
+scipy = "^1.10.1"
+numpy = "^1.24.3"
+ipykernel = "^6.25.0"
+matplotlib = "^3.7.2"
+sympy = "^1.12"
+pandas = "^1.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
