@@ -4,26 +4,10 @@ import os
 from scipy.special import binom
 from copy import deepcopy
 from typing import Union
-
-import pathlib
-import sys
+from analogrb.save_load import MODULE_DIR
 
 from analogrb import basis
 
-
-
-def MODULE_DIR():
-    # Get the directory path of the currently executing script or module
-    # This may be the virtual environment directory if the script is executed from there
-    # We'll use the location of the current script as a fallback if __file__ doesn't give the expected result
-    package_dir = os.path.dirname(os.path.abspath(__file__))
-
-    # If running from within a virtual environment, __file__ might point to the site-packages directory
-    # In such cases, fallback to the location of the current script
-    if 'site-packages' in package_dir:
-        package_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-    print(package_dir)
-    return package_dir
 
 CPP_EXECUTABLE = f"{MODULE_DIR()}/clebschgordan.out"
 PROJECTORS_DIR = lambda d, n: f"{MODULE_DIR()}/projectors/{d}modes_{n}particles/"

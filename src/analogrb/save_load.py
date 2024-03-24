@@ -1,14 +1,27 @@
-import pathlib
 from datetime import datetime
 import os
+import sys
 import json
 import numpy as np
 from typing import Union, Callable
 from pandas import DataFrame
 
-MODULE_DIR = pathlib.Path(__file__).parent.parent.parent
+def MODULE_DIR():
+    # Get the directory path of the currently executing script or module
+    # This may be the virtual environment directory if the script is executed from there
+    # We'll use the location of the current script as a fallback if __file__ doesn't give the expected result
+    package_dir = os.path.dirname(os.path.abspath(__file__))
 
-PROJECTORS_DIR = lambda d, n: f"{MODULE_DIR}/projectors/{d}modes_{n}particles/"
+    # If running from within a virtual environment, __file__ might point to the site-packages directory
+    # In such cases, fallback to the location of the current script
+    if 'site-packages' in package_dir:
+        package_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+    return package_dir
+
+# def MODULE_DIR():
+#     return 'absolute/path/to/analog-rb/directory/'
+
+PROJECTORS_DIR = lambda d, n: f"{MODULE_DIR()}/projectors/{d}modes_{n}particles/"
 PROJECTORS_FILE = (
     lambda d, n, irrep3: f"{PROJECTORS_DIR(d, n)}projector_{'-'.join(map(str, irrep3))}.txt"
 )
@@ -16,11 +29,11 @@ PROJECTORS_FILE = (
 NOW = lambda: datetime.now().strftime("%y-%m-%d-%H%M%S")
 
 ARBDIR = (
-    lambda d, n, int: f"{MODULE_DIR}/arbdata/{d}d_{n}n_{'int' if int else 'nonint'}/"
+    lambda d, n, int: f"{MODULE_DIR()}/arbdata/{d}d_{n}n_{'int' if int else 'nonint'}/"
 )
 ARBDIR_NEW_SIMULATION = lambda d, n, int: f"{ARBDIR(d, n, int)}sim-{NOW()}/"
 
-FPDIR = lambda d, n, int: f"{MODULE_DIR}/fpdata/{d}d_{n}n_{'int' if int else 'nonint'}/"
+FPDIR = lambda d, n, int: f"{MODULE_DIR()}/fpdata/{d}d_{n}n_{'int' if int else 'nonint'}/"
 FPDIR_NEW_SIMULATION = lambda d, n, int: f"{FPDIR(d, n, int)}data-{NOW()}/"
 
 METADATA_FILENAME = "metadata.json"
