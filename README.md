@@ -2,13 +2,13 @@
 
 ## Requirements
 
-I recomment using [virtual environments](https://docs.python.org/3/tutorial/venv.html) and [pip](https://pypi.org/project/pip/).
-The main instruction how to build a virtual enviroment and install this package and its requirements are listed below, given that python 3 and pip are installed.
+I recommend using [virtual environments](https://docs.python.org/3/tutorial/venv.html) and [pip](https://pypi.org/project/pip/).
+The main instructions how to build a virtual environment and install this package and its requirements are listed below, given that Python 3 and pip are installed.
 
-1. Open a terminal and navigate into this projects directory (.../analog-rb).
-2. Create a virtual environment
+1. Open a terminal and navigate into this project's directory (.../analog-rb).
+2. Create a virtual environment (type `python` or `python3`):
 ```console
-python3 -m venv analogrbvenv
+python -m venv analogrbvenv
 ```
 3. Activate this virtual environment in the terminal with 
 ```console
@@ -31,6 +31,19 @@ Then run the following in the `analog-rb` directory in a terminal:
 g++ -o clebschgordan.out ClebschGordan.cpp -llapack
 ```
 which should produce a file on the same level as the `README.md` called `clebschgordan.out`.
+
+## Debugging
+The data might be not stored in the right directory. Then you have to set the path by hand.
+For that open file `src/analogrb/save_load` and comment out the function `MODULE_DIR()`.
+Instead, comment in the function below that and enter the absolute path to the directory of your analog-rb:
+
+![Bildschirmfoto 2024-03-24 um 16 38 50](https://github.com/wilkensJ/analog-rb/assets/70592365/aec6a863-5768-4f2b-a6b1-a0b47e3229bc)
+
+Should then look like this (of course add your path here):
+
+![Bildschirmfoto 2024-03-24 um 16 43 31](https://github.com/wilkensJ/analog-rb/assets/70592365/47ca8a35-ec19-4ee0-8fc6-6a5aeeda8c2b)
+
+Then, after saving, again type `pip install .` in your terminal.
 
 ## Usage
 
