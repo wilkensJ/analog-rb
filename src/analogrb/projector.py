@@ -3,22 +3,36 @@ import numpy as np
 import os
 from scipy.special import binom
 from copy import deepcopy
+from typing import Union
 
 import pathlib
+import sys
 
 from analogrb import basis
 
 
 
-MODULE_DIR = pathlib.Path(__file__).parent.parent.parent  
-CPP_EXECUTABLE = f"{MODULE_DIR}/clebschgordan.out"
-PROJECTORS_DIR = lambda d, n: f"{MODULE_DIR}/projectors/{d}modes_{n}particles/"
+def MODULE_DIR():
+    # Get the directory path of the currently executing script or module
+    # This may be the virtual environment directory if the script is executed from there
+    # We'll use the location of the current script as a fallback if __file__ doesn't give the expected result
+    package_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # If running from within a virtual environment, __file__ might point to the site-packages directory
+    # In such cases, fallback to the location of the current script
+    if 'site-packages' in package_dir:
+        package_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+    print(package_dir)
+    return package_dir
+
+CPP_EXECUTABLE = f"{MODULE_DIR()}/clebschgordan.out"
+PROJECTORS_DIR = lambda d, n: f"{MODULE_DIR()}/projectors/{d}modes_{n}particles/"
 PROJECTORS_FILE = lambda d, n, irrep3: f"{PROJECTORS_DIR(d, n)}projector_{'-'.join(map(str, irrep3))}.txt"
 CONJ_SYM_IRREP = lambda d, n: [n] * (d-1) + [0]
 IRREPS = lambda d, n: [[2 * l] + [l] * (d - 2) + [0] for l in range(1, n + 1)]
 DIM_IRREPS = lambda d, n: [(d + 2 * l - 1) / (d -1) * int(binom(d + l - 2, l)) ** 2 for l in range(n, 0, -1)]
 
-def dim_irrep(irrep: list | np.ndarray) -> int:
+def dim_irrep(irrep: Union[list, np.ndarray]) -> int:
     irrep = np.array(irrep)
     kprime, k = np.triu_indices(len(irrep), 1)
     dim = np.prod(1 + (irrep[k] - irrep[kprime]) / (kprime - k))
@@ -122,7 +136,7 @@ def save_clebsch_gordan_coefficients(d, n):
         a, b = process.communicate(input=input_text)
 
 
-def compute_minus_positions(irrep: list | np.ndarray) -> list[int]:
+def compute_minus_positions(irrep: Union[list, np.ndarray]) -> list[int]:
     p = Pattern(np.array(irrep))
     signs_list = [p.sign]
     for k in range(p.index - 1):
