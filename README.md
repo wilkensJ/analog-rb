@@ -20,16 +20,17 @@ pip install .
 ```
 
 ### compile C++ code
-In order to run the non-interaction randomized analog benchmarking protocol, the projectors have to be build. 
+Only needed if non-interactive systems are benchmarked. If only the demo protocols are run, it is also not needed since the projectors are pre-saved.
+
 The ClebschGordan.cpp code which calculates the needed Clebsch-Gordan coefficients for the projector was  taken from Ref. [Alex, 2021](https://doi.org/10.1063/1.3521562).
-It has to be transformed into an executable script, how to do that depends on the OS system in use.
-In general, store the compile ClebschGordan.cpp as 'clebschgordan.out'
-The C++ engine has to be installed first in order to make it executable, I suggest using `g++` and installing it via `conda`. 
+It has to be transformed into an executable script, how to do that depends on the operating system in use.
+The C++ engine has to be installed first in order to make it executable, I suggest using `g++` and installing it via `conda` for Linux, something like `MinGW-W64` for windows and for mac using `homebrew`. 
 Once this is installed the package `lapack` has to be installed.
-Then run
+Then run the following in the `analog-rb` directory in a terminal:
 ```console
-g++ ClebschGordan.cpp -framework Accelerate -o clebschgordan.out
+g++ -o clebschgordan.out ClebschGordan.cpp -llapack
 ```
+which should produce a file on the same level as the `README.md` called `clebschgordan.out`.
 
 ## Usage
 
