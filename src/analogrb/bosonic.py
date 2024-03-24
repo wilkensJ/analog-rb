@@ -95,19 +95,19 @@ def symbolic_hopping(
     )
     return diagonal + H
 
-def symbolic_onside_interaction(d:int, n:int) -> sympy.matrices.dense.MutableDenseMatrix:
+def symbolic_OnSite_interaction(d:int, n:int) -> sympy.matrices.dense.MutableDenseMatrix:
     vs = np.array(fock(d, n))
-    onside_2particle_str = [f"V{k}{k}{k}{k}" for k in range(1, d + 1)]
-    onside_interaction_matrix = sympy.Matrix(
+    OnSite_2particle_str = [f"V{k}{k}{k}{k}" for k in range(1, d + 1)]
+    OnSite_interaction_matrix = sympy.Matrix(
         len(vs), len(vs),
         lambda i,j: sum([
-            sympy.Integer(vs[i][k] * (vs[i][k] - 1)) * sympy.var(onside_2particle_str[k])
+            sympy.Integer(vs[i][k] * (vs[i][k] - 1)) * sympy.var(OnSite_2particle_str[k])
             for k in range(d)
         ])
         if i == j
         else sympy.Integer(0),
     )
-    return onside_interaction_matrix
+    return OnSite_interaction_matrix
 
 
 def generate_hop_strings(d: int, xdim: int) -> tuple[list, list, list]:
@@ -173,19 +173,30 @@ class NonintNNHamiltonian(NNHamiltonian):
         return self.sym_H_hopping
         
 
-class OnsideIntNNHamiltonian(NonintNNHamiltonian):
+class OnSiteIntNNHamiltonian(NonintNNHamiltonian):
     def __init__(self, d, n, ydim=1) -> None:
         super().__init__(d, n, ydim)
         self.interacting = True
     
     def build(self):
         super().build()
-        self.sym_H_interacting = symbolic_onside_interaction(self.d, self.n)
+        self.sym_H_interacting = symbolic_OnSite_interaction(self.d, self.n)
         variables = [sympy.symbols(f"V{k}{k}{k}{k}") for k in range(1, self.d + 1)]
         self.set_H_interacting = sympy.lambdify(variables, self.sym_H_interacting, modules="numpy")
 
-    def evaluate(self, hopping_diag, hopping_band, interacting_onside):
-        return super().evaluate(hopping_diag, hopping_band) + self.set_H_interacting(*interacting_onside)
+    def evaluate(self, hopping_diag:np.ndarray, hopping_band:np.ndarray, interacting_onsite:np.ndarray) -> np.ndarray:
+        """Sets the hopping terms (diagonal and band) and the interaction terms to real values.
+
+        Args:
+            hopping_diag (np.ndarray): As many as there are sites.
+            hopping_band (np.ndarray): As many as there are connections, depends on the structure of the lattice.
+            interacting_onsite (np.ndarray): As many as there are sites
+
+        Returns:
+            np.ndarray: The Hamiltonian in matrix form.
+        """
+        
+        return super().evaluate(hopping_diag, hopping_band) + self.set_H_interacting(*interacting_onsite)
     
     def show(self):
         return super().show() + self.sym_H_interacting

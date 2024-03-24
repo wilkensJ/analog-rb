@@ -63,13 +63,13 @@ class NNHGateFactory(GateFactory):
     def draw_hamiltonian(self) -> np.ndarray:
         return self.Hamiltonian.evaluate(
             *self.draw_hopping_entries(),
-            self.draw_onside_interaction_entries() if self.Hamiltonian.interacting else None
+            self.draw_OnSite_interaction_entries() if self.Hamiltonian.interacting else None
         )
 
     def draw_hopping_entries(self) -> tuple[np.ndarray, np.ndarray]:
         pass
     
-    def draw_onside_interaction_entries(self) -> np.ndarray:
+    def draw_OnSite_interaction_entries(self) -> np.ndarray:
         pass
     
     @property
@@ -120,13 +120,13 @@ class MixupNNHGateFactory(NNHGateFactory):
         return self.Hamiltonian.evaluate(
             self.draw_hopping_entries()[0] * 0,
             self.draw_hopping_entries()[1] * 0,
-            self.draw_onside_interaction_entries()
+            self.draw_OnSite_interaction_entries()
         )
 
     def draw_actual_Hamiltonian(self):
         return self.Hamiltonian.evaluate(
             *self.draw_hopping_entries(),
-             self.draw_onside_interaction_entries() * 0
+             self.draw_OnSite_interaction_entries() * 0
         )
     
 class UniformNNHGateFactory(NNHGateFactory):
@@ -142,7 +142,7 @@ class UniformNNHGateFactory(NNHGateFactory):
         ) + 1j * np.random.uniform(size=self.Hamiltonian.band_dim, low=self.low, high=self.high)
         return diag_entries, band_entries
     
-    def draw_onside_interaction_entries(self) -> np.ndarray:
+    def draw_OnSite_interaction_entries(self) -> np.ndarray:
         return np.array(np.random.uniform(size=self.Hamiltonian.d, low=self.low, high=self.high), dtype=np.complex128)
     
     @property
@@ -179,7 +179,7 @@ class UnwantedInteractionsUniformNHHGateFactory(UniformNNHGateFactory, MixupNNHG
         MixupNNHGateFactory.__init__(self, Hamiltonian, time)
         self.interr = interr
     
-    def draw_onside_interaction_entries(self) -> np.ndarray:
+    def draw_OnSite_interaction_entries(self) -> np.ndarray:
         return np.zeros(self.Hamiltonian.d) + self.interr 
 
     @property
@@ -203,7 +203,7 @@ class TooLessInteractionsUniformNHHGateFactory(UniformNNHGateFactory, MixupNNHGa
         }
     def generate_gate(self, time: float | None = None) -> ndarray:
         hopping = self.draw_hopping_entries()
-        noerrint = self.draw_onside_interaction_entries()
+        noerrint = self.draw_OnSite_interaction_entries()
         H = self.Hamiltonian.evaluate(hopping[0], hopping[1], noerrint)
         Herr = self.Hamiltonian.evaluate(hopping[0], hopping[1], noerrint * self.interr_percent)
         U = expm(-H * 1j * (time if time is not None else self.time))
@@ -223,7 +223,7 @@ class UniformHoppingConstantOnsiteIntNNHGateFactory(UniformNNHGateFactory):
         super().__init__(Hamiltonian, time, low, high)
         self.onsite_value = onsite_value
 
-    def draw_onside_interaction_entries(self) -> np.ndarray:
+    def draw_OnSite_interaction_entries(self) -> np.ndarray:
         return np.ones(self.Hamiltonian.d) * self.onsite_value 
     
     @property
@@ -240,15 +240,15 @@ class SycamoreGateFactory(NNHGateFactory):
         self.low_diag = -20 * MHz
         self.high_diag = 20 * MHz
         self.band_entries = -20 * MHz
-        self.onside_interaction_entry = -1 * MHz
+        self.OnSite_interaction_entry = -1 * MHz
 
     def draw_hopping_entries(self) -> tuple[np.ndarray, np.ndarray]:
         band_entries = np.repeat(self.band_entries, self.Hamiltonian.band_dim)
         diag_entries = np.random.uniform(size=self.Hamiltonian.d, low = self.low_diag, high=self.high_diag)
         return diag_entries, band_entries
     
-    def draw_onside_interaction_entries(self) -> np.ndarray:
-        return np.ones(self.Hamiltonian.d, dtype=np.complex128) * self.onside_interaction_entry
+    def draw_OnSite_interaction_entries(self) -> np.ndarray:
+        return np.ones(self.Hamiltonian.d, dtype=np.complex128) * self.OnSite_interaction_entry
 
 class MMSycamoreGateFactory(SycamoreGateFactory, ModelMismatchNNHGateFactory):
     def __init__(self, Hamiltonian: NNHamiltonian, mismatch) -> None:
