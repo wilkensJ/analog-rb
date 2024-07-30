@@ -1,6 +1,6 @@
 import sympy
 import numpy as np
-from analogrb.basis import fock
+from rab.basis import fock
 from scipy.special import binom
 from scipy.linalg import expm
 

@@ -3,12 +3,12 @@ import pandas as pd
 import os
 
 from scipy.special import binom
-from analogrb.projector import AllProjectors
-from analogrb.bootstrap import fit_with_bootstrap
+from rab.projector import AllProjectors
+from rab.bootstrap import fit_with_bootstrap
 from copy import deepcopy
 
 
-from analogrb.save_load import (
+from rab.save_load import (
     create_dir_arb,
     save_meta_data_arb,
     save_datarow,
@@ -59,14 +59,14 @@ def filterf(datarow, rho_init, all_projectors):
     for p in all_projectors:
         datarow[f"q_{p.name}"] = np.real(
             filter_function(p.projector, datarow["U"].reshape(rho_init.shape), rho_init)
-            @ datarow["outcomes"]
+            @ datarow["probabilities"]
         )
     return datarow
 
 
 def polish(datarow):
     datarow["m"] = int(np.real(datarow["m"]))
-    datarow["outcomes"] = np.real(datarow["outcomes"])
+    datarow["probabilities"] = np.real(datarow["probabilities"])
     datarow["U"] = datarow["U"].reshape(int(np.sqrt(len(datarow["U"]))), -1)
     return datarow
 
@@ -88,7 +88,7 @@ def acquire(length, gatefactory, rho_init, error_channel):
         rho = error_channel.apply(rho)
     return {
         "m": length,
-        "outcomes": np.real(np.diag(rho)),
+        "probabilities": np.real(np.diag(rho)),
         "U": gates_product,
     }
 
@@ -173,7 +173,7 @@ def postprocess(path):
         try:
             datarow = load_datarow(path, txt_filenames, k)
             mydict = filter_helper(
-                all_projectors, datarow["U"], rho_init, datarow["outcomes"], ns
+                all_projectors, datarow["U"], rho_init, datarow["probabilities"], ns
             )
             save_datarow(path, mydict)
             mydict["m"] = int(np.real(datarow["m"]))
@@ -186,7 +186,7 @@ def postprocess(path):
 
 
 def aggregate(data_path, start_fitting, nbootstraps, confidence, nshots="inf"):
-    df = pd.DataFrame(load_data(data_path, dont_load=["U", "outcomes"]))
+    df = pd.DataFrame(load_data(data_path, dont_load=["U", "probabilities"]))
     df["m"] = df["m"].astype(int)
     ms = np.array(df["m"], dtype=int)
     msmax = np.max(ms)

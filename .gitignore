@@ -28,7 +28,7 @@ arbdata/
 fpdata/
 
 venv/
-analogrbvenv/
+rabvenv/
 
 *.sh
 *.yaml

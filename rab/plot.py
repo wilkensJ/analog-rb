@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from analogrb.bootstrap import fit_with_bootstrap
-from analogrb.arb_protocol import EXP_FUNC
-from analogrb.save_load import extract_from_data
+from rab.bootstrap import fit_with_bootstrap
+from rab.protocol import EXP_FUNC
+from rab.save_load import extract_from_data
 import pandas as pd
 
 COLORS=['#AF58BA','#32CB7B', '#FFC61E','#ED5DA3']

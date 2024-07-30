@@ -5,7 +5,7 @@ import numpy as np
 from numpy import ndarray
 from scipy.linalg import expm
 
-from analogrb.bosonic import NNHamiltonian
+from rab.bosonic import NNHamiltonian
 
 
 def haar_unitary(dim: int) -> np.ndarray:
